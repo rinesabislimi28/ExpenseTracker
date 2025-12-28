@@ -69,9 +69,15 @@ npm install
       }
 
 
+<<<<<<< HEAD
 ### 5. Start the App
   npx expo start
+=======
+### 5. **Start the App**
+npx expo start
+>>>>>>> 68843e12427aa7153268285648af8e8cdfa9d5ac
 
+---
 
 ## 👥 Credits
 
