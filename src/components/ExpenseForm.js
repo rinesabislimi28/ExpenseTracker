@@ -1,153 +1,126 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Keyboard } from "react-native";
+import { View, TextInput, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useExpenses } from "../context/ExpenseContext";
 import { COLORS, SIZES, SHADOWS } from "../constants/theme";
-import { Ionicons } from '@expo/vector-icons';
 
-const categories = [
-  { label: "Food", icon: "fast-food" },
-  { label: "Transport", icon: "car" },
-  { label: "Entertainment", icon: "film" },
-  { label: "Shopping", icon: "cart" },
-  { label: "Bills", icon: "receipt" },
-  { label: "Other", icon: "cube" },
-];
+// Available transaction categories
+const CATEGORIES = ["Food", "Transport", "Shopping", "Bills", "Entertainment", "Savings", "Other"];
 
 export default function ExpenseForm() {
+  // Access the addExpense function from the context
   const { addExpense } = useExpenses();
+  
+  // Local state for form inputs
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Food");
 
-  function handleAdd() {
+  // Handle the form submission
+  const handleSubmit = () => {
+    // Basic validation to ensure fields are not empty
     if (!title || !amount) return;
-    const numericAmount = parseFloat(amount);
-    if (isNaN(numericAmount) || numericAmount <= 0) return;
 
+    // Send data to Firebase via Context
     addExpense({
       title,
-      amount: numericAmount,
+      amount: parseFloat(amount),
       category,
       date: new Date().toISOString(),
     });
 
-    setTitle(""); 
-    setAmount(""); 
-    Keyboard.dismiss();
-  }
+    // Reset inputs after successful submission
+    setTitle("");
+    setAmount("");
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>New Transaction</Text>
-      
-      <View style={styles.inputGroup}>
-        <View style={styles.inputWrapper}>
-          <Text style={styles.label}>Title</Text>
-          <TextInput 
-              style={styles.input} 
-              value={title} 
-              onChangeText={setTitle} 
-              placeholder="e.g. Starbucks" 
-              placeholderTextColor={COLORS.textTertiary}
-          />
-        </View>
+      {/* Transaction Title Input */}
+      <TextInput 
+        style={styles.input} 
+        placeholder="Title" 
+        value={title} 
+        onChangeText={setTitle} 
+      />
 
-        <View style={[styles.inputWrapper, {marginTop: 15}]}>
-          <Text style={styles.label}>Amount</Text>
-          <View style={styles.amountContainer}>
-             <Text style={styles.currencySymbol}>$</Text>
-             <TextInput 
-                style={[styles.input, styles.amountInput]} 
-                value={amount} 
-                onChangeText={setAmount} 
-                placeholder="0.00" 
-                keyboardType="numeric" 
-                placeholderTextColor={COLORS.textTertiary}
-            />
-          </View>
-        </View>
+      {/* Transaction Amount Input */}
+      <TextInput 
+        style={styles.input} 
+        placeholder="Amount" 
+        value={amount} 
+        keyboardType="numeric" 
+        onChangeText={setAmount} 
+      />
+      
+      {/* Category Selection List */}
+      <View style={styles.catContainer}>
+        {CATEGORIES.map((cat) => (
+          <TouchableOpacity 
+            key={cat} 
+            style={[
+                styles.catButton, 
+                category === cat && styles.activeCat // Apply active style if selected
+            ]} 
+            onPress={() => setCategory(cat)}
+          >
+            <Text style={{ color: category === cat ? "#FFF" : COLORS.textPrimary }}>
+                {cat}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
-      {/* Category Selector (Custom Chips) */}
-      <Text style={[styles.label, {marginTop: 20, marginBottom: 10}]}>Select Category</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catScroll}>
-        {categories.map((cat) => {
-          const isActive = category === cat.label;
-          return (
-            <TouchableOpacity 
-              key={cat.label} 
-              onPress={() => setCategory(cat.label)}
-              style={[styles.catItem, isActive && styles.catItemActive]}
-            >
-              <Ionicons name={cat.icon} size={16} color={isActive ? "#FFF" : COLORS.textSecondary} style={{marginRight: 6}} />
-              <Text style={[styles.catText, isActive && styles.catTextActive]}>{cat.label}</Text>
-            </TouchableOpacity>
-          )
-        })}
-      </ScrollView>
-
-      {/* Add Button */}
-      <TouchableOpacity style={styles.btnAdd} onPress={handleAdd} activeOpacity={0.8}>
-          <Text style={styles.btnText}>Add Expense</Text>
+      {/* Submit Button */}
+      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+        <Text style={styles.submitText}>Add Transaction</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
+// Stylesheet with vertical property formatting
 const styles = StyleSheet.create({
-  container: { marginBottom: 30 },
-  heading: { fontSize: SIZES.h2, fontWeight: "700", color: COLORS.textPrimary, marginBottom: 15 },
-  
-  inputGroup: {
-    backgroundColor: COLORS.card,
-    padding: 20,
-    borderRadius: SIZES.radius,
-    ...SHADOWS.card
+  container: { 
+    backgroundColor: COLORS.card, 
+    padding: 20, 
+    borderRadius: SIZES.radius, 
+    marginBottom: 20,
+    ...SHADOWS.card 
   },
-  inputWrapper: {},
-  label: { fontSize: 12, color: COLORS.textSecondary, marginBottom: 8, fontWeight: "700", textTransform: 'uppercase' },
-  input: {
-      backgroundColor: COLORS.background,
-      borderRadius: 12,
-      paddingHorizontal: 15,
-      paddingVertical: 14,
-      fontSize: 16,
-      color: COLORS.textPrimary,
-      fontWeight: '600'
+  input: { 
+    backgroundColor: COLORS.background, 
+    padding: 12, 
+    borderRadius: 10, 
+    marginBottom: 10,
+    color: COLORS.textPrimary
   },
-  amountContainer: { position: 'relative' },
-  currencySymbol: { position: 'absolute', left: 15, top: 14, zIndex: 1, fontSize: 16, color: COLORS.textSecondary, fontWeight: 'bold'},
-  amountInput: { paddingLeft: 30 },
-
-  // Categories
-  catScroll: { paddingRight: 20 },
-  catItem: {
-    flexDirection: 'row',
+  catContainer: { 
+    flexDirection: 'row', 
+    flexWrap: 'wrap', 
+    gap: 5, 
+    marginBottom: 15 
+  },
+  catButton: { 
+    padding: 8, 
+    backgroundColor: COLORS.background, 
+    borderRadius: 8, 
+    borderWidth: 1, 
+    borderColor: '#EEE' 
+  },
+  activeCat: { 
+    backgroundColor: COLORS.primary, 
+    borderColor: COLORS.primary 
+  },
+  submitBtn: { 
+    backgroundColor: COLORS.primary, 
+    padding: 15, 
+    borderRadius: 12, 
     alignItems: 'center',
-    backgroundColor: COLORS.card,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 30,
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    justifyContent: 'center'
   },
-  catItemActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-    ...SHADOWS.soft 
-  },
-  catText: { fontWeight: "600", color: COLORS.textSecondary },
-  catTextActive: { color: "#FFF" },
-
-  // Button
-  btnAdd: {
-      backgroundColor: COLORS.primary, 
-      borderRadius: SIZES.radius,
-      paddingVertical: 18,
-      alignItems: 'center',
-      marginTop: 25,
-      ...SHADOWS.soft
-  },
-  btnText: { color: "#FFF", fontWeight: "bold", fontSize: 16 }
+  submitText: { 
+    color: "#FFF", 
+    fontWeight: "bold",
+    fontSize: 16
+  }
 });
