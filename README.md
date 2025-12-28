@@ -37,37 +37,39 @@ A professional-grade mobile application built with **React Native (Expo)** and *
 ```bash
 git clone <your-repository-link>
 cd expense-tracker-app
+```
 
 ### 2. Install Dependencies
 npm install
 
 ### 3. Configure Environment Variables
-
 - Create a .env file in the root directory and add your Firebase credentials:
-EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_id
-EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
+  EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key
+  EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+  EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+  EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+  EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_id
+  EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
 
-
-
-### 4. **Firestore Security Rules**
-
+### 4. Firestore Security Rules
 - To enable data synchronization, ensure your Firebase database rules allow read/write access (Development Mode):
-  rules_version = '2';
-  service cloud.firestore {
-      match /databases/{database}/documents {
-        match /{document=**} {
-          allow read, write: if true; 
+    
+    rules_version = '2';
+
+      service cloud.firestore {
+        
+        match /databases/{database}/documents {
+
+          match /{document=**} {
+            
+            allow read, write: if true; 
+            
+          }
         }
       }
-    }
 
 
-5. **Start the App**
-
+### 5. Start the App
   npx expo start
 
 
