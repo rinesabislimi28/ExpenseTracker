@@ -66,10 +66,10 @@ EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
     }
 
 
-5. **Start the App**
+### 5. **Start the App**
+npx expo start
 
-  npx expo start
-
+---
 
 ## 👥 Credits
 
